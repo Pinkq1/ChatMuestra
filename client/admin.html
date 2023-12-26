@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+
+  <body>
+    <div id="app-admin">
+      <div class="container mt-5">
+      
+       
+        <button class="btn btn-primary" @click="openAddProductModal">Añadir Producto</button>
+         <!-- Modal Crear -->
+        <div
+          class="modal"
+          id="openAddProductModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Agregar Producto
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <form @submit.prevent="addProduct">
+                  <div class="mb-3">
+                    <label for="pro_nombre" class="form-label">Nombre:</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="pro_nombre"
+                      v-model="newProduct.pro_nombre"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="pro_descripcion" class="form-label"
+                      >Descripción:</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="pro_descripcion"
+                      v-model="newProduct.pro_descripcion"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="pro_stock" class="form-label">stock:</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="pro_stock"
+                      v-model="newProduct.pro_stock"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="pro_precio" class="form-label"
+                      >Precio:</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="pro_precio"
+                      v-model="newProduct.pro_precio"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="pro_proveedor" class="form-label"
+                      >Proveedor:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="pro_proveedor"
+                      v-model="newProduct.pro_proveedor"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary">Agregar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+<!-- Termina Modal para Crear -->
+<!-- Modal para Editar -->
+<div
+class="modal"
+id="openEditProductModal"
+tabindex="-1"
+aria-labelledby="editProductModalLabel"
+
+aria-hidden="true"
+>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="editProductModalLabel">
+        Editar Producto
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form @submit.prevent="saveEdit">
+        <div class="mb-3">
+          <label for="pro_nombre" class="form-label">Nombre:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="pro_nombre"
+            v-model="editingRecord.pro_nombre"
+            required
+          />
+        </div>
+        
+        <div class="mb-3">
+          <label for="pro_descripcion" class="form-label"
+            >Descripción:</label
+          >
+          <textarea
+            class="form-control"
+            id="pro_descripcion"
+            v-model="editingRecord.pro_descripcion"
+            required
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="pro_stock" class="form-label">stock:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="pro_stock"
+            v-model="editingRecord.pro_stock"
+            required
+          />
+        </div>  
+        <div class="mb-3">
+          <label for="pro_precio" class="form-label"
+            >Precio:</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="pro_precio"
+            v-model="editingRecord.pro_precio"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="pro_proveedor" class="form-label"
+            >Proveedor:</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="pro_proveedor"
+            v-model="editingRecord.pro_proveedor"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Editar</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Termina Modal para Editar -->
+
+
+
+<!-- Tabla de listar -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Stock</th>
+              <th>Precio</th>
+              <th>Proveedor</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="record in records" :key="record.id">
+              <td>{{ record.fields.pro_id }}</td>
+              <td>{{ record.fields.pro_nombre }}</td>
+              <td>{{ record.fields.pro_descripcion }}</td>
+              <td>{{ record.fields.pro_stock }}</td>
+              <td>{{ record.fields.pro_precio }}</td>
+              <td>{{ record.fields.pro_proveedor }}</td>
+              <td>
+                <button class="btn btn-info" @click="openEditProductModal(record)">
+                  Editar
+                </button>
+                
+                <button class="btn btn-danger" @click="deleteRecord(record)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+<!-- Tabla de listar -->
+    <script src="../public/js/main.js"></script>
+  </body>
+</html>
